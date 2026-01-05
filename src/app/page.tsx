@@ -16,10 +16,14 @@ type Record = {
 export default function Home() {
   const [userName, setUserName] = useState<string | null>(null);
   const [menu, setMenu] = useState<DailyMenu | null>(null);
-  const [inputScore, setInputScore] = useState<number>(0); // Changed to number for stepper
+  const [inputScore, setInputScore] = useState<number>(0);
   const [records, setRecords] = useState<Record[]>([]);
   const [showFeedback, setShowFeedback] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  // Timer State
+  const [timerPhase, setTimerPhase] = useState<"IDLE" | "PREP" | "WORK" | "FINISHED">("IDLE");
+  const [timeLeft, setTimeLeft] = useState(0);
 
   useEffect(() => {
     // Load data
@@ -31,6 +35,71 @@ export default function Home() {
     setMenu(getDailyMenu());
     setLoading(false);
   }, []);
+
+  // Timer Logic
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+
+    if (timerPhase === "PREP" && timeLeft > 0) {
+      interval = setInterval(() => {
+        setTimeLeft((prev) => prev - 1);
+      }, 1000);
+    } else if (timerPhase === "PREP" && timeLeft === 0) {
+      // Switch to Main Work Phase (10 minutes = 600 seconds)
+      setTimerPhase("WORK");
+      setTimeLeft(600);
+      playBeep(440, 0.1); // Start beep
+    } else if (timerPhase === "WORK" && timeLeft > 0) {
+      interval = setInterval(() => {
+        setTimeLeft((prev) => {
+          // Last 5 seconds sound effect
+          if (prev <= 6 && prev > 1) { // beep at 5, 4, 3, 2, 1 (prev is current, will become prev-1)
+            playBeep(880, 0.1);
+          }
+          // Long beep at finish
+          if (prev === 1) {
+            playBeep(880, 0.6);
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } else if (timerPhase === "WORK" && timeLeft === 0) {
+      setTimerPhase("FINISHED");
+    }
+
+    return () => clearInterval(interval);
+  }, [timerPhase, timeLeft]);
+
+  // Sound Effect Helper
+  const playBeep = (freq: number, duration: number) => {
+    try {
+      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContext) return;
+
+      const ctx = new AudioContext();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+
+      gain.gain.setValueAtTime(0.1, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + duration);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start();
+      osc.stop(ctx.currentTime + duration);
+    } catch (e) {
+      console.error("Audio playback failed", e);
+    }
+  };
+
+  const handleStartTimer = () => {
+    setTimerPhase("PREP");
+    setTimeLeft(3); // 3 seconds prep
+  };
 
   const handleRegister = (name: string) => {
     setUserName(name);
@@ -56,8 +125,23 @@ export default function Home() {
     setTimeout(() => setShowFeedback(false), 3000);
   };
 
-  const handleIncrement = () => setInputScore(prev => prev + 1);
-  const handleDecrement = () => setInputScore(prev => Math.max(0, prev - 1));
+  // Fixed Increment/Decrement Logic
+  const handleIncrement = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent form submission or bubbling
+    setInputScore((prev) => prev + 1);
+  };
+
+  const handleDecrement = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setInputScore((prev) => Math.max(0, prev - 1));
+  };
+
+  // Timer Formatting
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
 
 
   if (loading) return <div className="min-h-screen bg-white flex items-center justify-center text-nadeshiko-blue">読み込み中...</div>;
@@ -81,6 +165,64 @@ export default function Home() {
       </header>
 
       <div className="max-w-md mx-auto p-4 space-y-6">
+
+        {/* Timer Section */}
+        <section className="bg-gradient-to-br from-indigo-900 to-nadeshiko-blue rounded-xl p-5 shadow-lg text-white text-center relative overflow-hidden">
+          {/* Background decorative elements */}
+          <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+            <Activity size={200} className="absolute -right-10 -bottom-10" />
+          </div>
+
+          {timerPhase === "IDLE" && (
+            <div className="py-4">
+              <h2 className="text-xl font-bold mb-4">トレーニングをはじめよう！</h2>
+              <button
+                onClick={handleStartTimer}
+                className="bg-nadeshiko-red hover:bg-red-500 text-white text-xl font-bold py-4 px-10 rounded-full shadow-lg transform transition active:scale-95 animate-pulse"
+              >
+                スタート (10分)
+              </button>
+            </div>
+          )}
+
+          {timerPhase === "PREP" && (
+            <div className="py-2">
+              <p className="text-lg font-bold opacity-80 mb-2">じゅんびしてね！</p>
+              <div className="text-8xl font-black text-white animate-bounce">
+                {timeLeft}
+              </div>
+            </div>
+          )}
+
+          {timerPhase === "WORK" && (
+            <div className="py-2">
+              <p className="text-sm font-bold opacity-80 mb-1">トレーニング中！</p>
+              {timeLeft <= 5 ? (
+                // Last 5 seconds huge display
+                <div className="text-[120px] leading-none font-black text-nadeshiko-red animate-pulse scale-110 duration-75">
+                  {timeLeft}
+                </div>
+              ) : (
+                <div className="text-7xl font-black font-mono tracking-wider">
+                  {formatTime(timeLeft)}
+                </div>
+              )}
+            </div>
+          )}
+
+          {timerPhase === "FINISHED" && (
+            <div className="py-4">
+              <h2 className="text-3xl font-bold mb-2">しゅうりょう！！</h2>
+              <p className="mb-4">おつかれさま！回数を入力してね。</p>
+              <button
+                onClick={() => setTimerPhase("IDLE")}
+                className="bg-white/20 hover:bg-white/30 text-white text-sm font-bold py-2 px-6 rounded-full"
+              >
+                リセット
+              </button>
+            </div>
+          )}
+        </section>
 
         {/* Today's Menu */}
         {menu && (
