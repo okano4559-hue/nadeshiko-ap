@@ -1,7 +1,8 @@
 import { DailyMenu } from "@/lib/menuGenerator";
 import { DynamicIcon } from "@/components/DynamicIcon";
-import { Activity, Calendar, Pencil, CheckCircle, X, Clock, Play, RotateCcw } from "lucide-react";
+import { Activity, Calendar, Pencil, CheckCircle, X, Clock, Play, RotateCcw, Award } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { getRankColor } from "@/lib/utils";
 
 interface TrainingTabProps {
     userName: string | null;
