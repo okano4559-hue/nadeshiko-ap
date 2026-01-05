@@ -1,0 +1,189 @@
+import { DailyMenu } from "@/lib/menuGenerator";
+import { DynamicIcon } from "@/components/DynamicIcon";
+import { Activity, Calendar, Pencil, CheckCircle, X, Clock, Play, RotateCcw } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+
+interface TrainingTabProps {
+    userName: string | null;
+    isEditingName: boolean;
+    tempName: string;
+    setTempName: (name: string) => void;
+    setIsEditingName: (isEditing: boolean) => void;
+    handleNameSave: () => void;
+    handleNameEditStart: () => void;
+
+    timerPhase: "IDLE" | "PREP" | "WORK" | "FINISHED";
+    timeLeft: number;
+    formatTime: (seconds: number) => string;
+    handleStartTimer: () => void;
+    setTimerPhase: (phase: "IDLE" | "PREP" | "WORK" | "FINISHED") => void;
+
+    menu: DailyMenu | null;
+}
+
+export function TrainingTab({
+    userName, isEditingName, tempName, setTempName, setIsEditingName, handleNameSave, handleNameEditStart,
+    timerPhase, timeLeft, formatTime, handleStartTimer, setTimerPhase,
+    menu
+}: TrainingTabProps) {
+    return (
+        <div className="space-y-6 pb-24 px-4 w-full max-w-md mx-auto">
+            {/* Header / User Info */}
+            <header className="flex justify-between items-center py-2">
+                <h1 className="text-2xl font-black italic tracking-tighter text-secondary">
+                    NADESIKO<span className="text-primary">.APP</span>
+                </h1>
+                <div className="relative group">
+                    {isEditingName ? (
+                        <div className="flex items-center bg-white shadow-sm ring-2 ring-primary/20 rounded-full px-3 py-1 animate-in fade-in zoom-in duration-200">
+                            <input
+                                type="text"
+                                value={tempName}
+                                onChange={(e) => setTempName(e.target.value)}
+                                className="bg-transparent text-secondary font-bold outline-none w-24 text-sm"
+                                autoFocus
+                            />
+                            <button onClick={handleNameSave} className="ml-1 text-green-600 hover:text-green-700 p-1">
+                                <CheckCircle size={18} />
+                            </button>
+                            <button onClick={() => setIsEditingName(false)} className="ml-1 text-slate-400 hover:text-slate-600 p-1">
+                                <X size={18} />
+                            </button>
+                        </div>
+                    ) : (
+                        <motion.button
+                            layout
+                            onClick={handleNameEditStart}
+                            className="flex items-center gap-2 px-3 py-1.5 bg-white rounded-full shadow-sm border border-slate-100 active:scale-95 transition-transform"
+                        >
+                            <span className="text-sm font-bold text-slate-700">{userName} 選手</span>
+                            <Pencil size={14} className="text-slate-400" />
+                        </motion.button>
+                    )}
+                </div>
+            </header>
+
+            {/* Today's Mission (Hero) */}
+            {menu && (
+                <section className="relative overflow-hidden rounded-3xl shadow-xl bg-secondary text-white p-6">
+                    <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+                        <Activity size={120} />
+                    </div>
+
+                    <div className="relative z-10">
+                        <div className="flex items-center gap-2 mb-2 text-primary-foreground/80">
+                            <Calendar size={16} />
+                            <span className="text-xs font-bold uppercase tracking-widest">{menu.day}のミッション</span>
+                        </div>
+                        <h2 className="text-3xl font-black italic mb-2 leading-none">{menu.theme}</h2>
+                        <p className="text-slate-300 text-sm mb-6 line-clamp-2">{menu.description}</p>
+
+                        <div className="space-y-3">
+                            {menu.items.map((item, idx) => (
+                                <div key={idx} className="flex items-center gap-4 bg-white/5 p-3 rounded-xl border border-white/10 backdrop-blur-sm">
+                                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+                                        <DynamicIcon name={item.iconName} size={20} />
+                                    </div>
+                                    <div className="flex-1">
+                                        <h4 className="font-bold text-sm">{item.name}</h4>
+                                        <p className="text-xs text-slate-400">コツ: {item.tips || "がんばれ！"}</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <span className="block text-xl font-black text-primary italic">{item.reps}</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            )}
+
+            {/* Timer Section */}
+            <section className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 relative overflow-hidden">
+                <div className="flex items-center gap-2 mb-6">
+                    <div className="p-2 bg-slate-100 rounded-lg text-secondary">
+                        <Clock size={20} />
+                    </div>
+                    <h3 className="text-lg font-bold text-secondary">タイムトライアル</h3>
+                </div>
+
+                <div className="flex flex-col items-center justify-center py-4">
+                    <AnimatePresence mode="wait">
+                        {timerPhase === "IDLE" && (
+                            <motion.div
+                                key="idle"
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.9 }}
+                                className="text-center w-full"
+                            >
+                                <div className="text-6xl font-black text-slate-200 mb-6 font-mono tracking-widest">10:00</div>
+                                <button
+                                    onClick={handleStartTimer}
+                                    className="w-full bg-primary text-white text-lg font-bold py-4 rounded-2xl shadow-lg shadow-primary/30 flex items-center justify-center gap-2 active:scale-95 transition-transform"
+                                >
+                                    <Play fill="currentColor" size={20} />
+                                    スタート
+                                </button>
+                            </motion.div>
+                        )}
+
+                        {timerPhase === "PREP" && (
+                            <motion.div
+                                key="prep"
+                                initial={{ opacity: 0, scale: 0.5 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 1.5 }}
+                                className="text-center"
+                            >
+                                <p className="text-xl font-bold text-primary mb-4 animate-pulse">準備せよ！</p>
+                                <div className="text-9xl font-black text-secondary">
+                                    {timeLeft}
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {timerPhase === "WORK" && (
+                            <motion.div
+                                key="work"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="text-center"
+                            >
+                                <p className="text-sm font-bold text-slate-400 mb-2">残り時間</p>
+                                {timeLeft <= 5 ? (
+                                    <div className="text-[100px] leading-none font-black text-primary animate-pulse tabular-nums">
+                                        {timeLeft}
+                                    </div>
+                                ) : (
+                                    <div className="text-7xl font-black text-secondary font-mono tracking-tight tabular-nums">
+                                        {formatTime(timeLeft)}
+                                    </div>
+                                )}
+                            </motion.div>
+                        )}
+
+                        {timerPhase === "FINISHED" && (
+                            <motion.div
+                                key="finished"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="text-center w-full"
+                            >
+                                <h3 className="text-3xl font-black text-primary italic mb-2">FINISH!!</h3>
+                                <p className="text-slate-500 mb-8 font-bold">おつかれさま！記録を入力しよう。</p>
+                                <button
+                                    onClick={() => setTimerPhase("IDLE")}
+                                    className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors"
+                                >
+                                    <RotateCcw size={18} />
+                                    リセット
+                                </button>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+            </section>
+        </div>
+    );
+}

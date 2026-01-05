@@ -1,6 +1,7 @@
 "use client";
 
 import { Trophy, Medal, Star } from "lucide-react";
+import { motion } from "framer-motion";
 
 interface RankingBoardProps {
     userName: string;
@@ -10,61 +11,71 @@ interface RankingBoardProps {
 export function RankingBoard({ userName, userScore }: RankingBoardProps) {
     // Base mock data
     const baseRankings = [
-        { id: 'npc1', name: "翼", score: 100, badge: "🏆" },
-        { id: 'npc2', name: "日向", score: 98, badge: "🥈" },
-        { id: 'npc3', name: "岬", score: 95, badge: "🥉" },
-        { id: 'npc4', name: "若林", score: 92, badge: "" },
-        { id: 'npc5', name: "石崎", score: 60, badge: "" },
+        { id: 'npc1', name: "TSUBASA", score: 120, badge: "🏆" },
+        { id: 'npc2', name: "HYUGA", score: 115, badge: "🥈" },
+        { id: 'npc3', name: "MISAKI", score: 95, badge: "🥉" },
+        { id: 'npc4', name: "WAKABAYASHI", score: 92 },
+        { id: 'npc5', name: "ISHIZAKI", score: 60 },
     ];
 
     // Combine user with base rankings
     const allPlayers = [
         ...baseRankings,
-        { id: 'user', name: userName || "あなた", score: userScore, badge: "YOU" }
+        { id: 'user', name: userName || "YOU", score: userScore, badge: "YOU" }
     ];
 
     // Sort by score descending
     const sortedRankings = allPlayers.sort((a, b) => b.score - a.score);
 
     return (
-        <div className="bg-gradient-to-br from-nadeshiko-blue to-blue-900 text-white p-4 rounded-xl shadow-lg">
-            <div className="flex items-center gap-2 mb-4">
-                <Trophy className="text-yellow-400" />
-                <h3 className="text-xl font-bold">今日のランキング</h3>
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+            <div className="p-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+                <h3 className="font-bold text-secondary uppercase tracking-wider text-sm flex items-center gap-2">
+                    <Trophy size={16} className="text-yellow-500" />
+                    Top Players
+                </h3>
             </div>
 
-            <div className="space-y-3">
+            <div className="divide-y divide-slate-100">
                 {sortedRankings.slice(0, 5).map((player, index) => {
                     const rank = index + 1;
                     const isUser = player.id === 'user';
 
+                    let rankIcon;
+                    if (rank === 1) rankIcon = <Trophy size={20} className="text-yellow-500 fill-yellow-500" />;
+                    else if (rank === 2) rankIcon = <Medal size={20} className="text-slate-400 fill-slate-300" />;
+                    else if (rank === 3) rankIcon = <Medal size={20} className="text-orange-400 fill-orange-300" />;
+                    else rankIcon = <span className="font-black text-slate-300 text-lg w-5 text-center">{rank}</span>;
+
                     return (
-                        <div
+                        <motion.div
+                            layout
                             key={player.id}
-                            className={`flex items-center justify-between p-3 rounded-lg backdrop-blur-sm transition-all duration-300 ${isUser
-                                ? "bg-nadeshiko-red/90 transform scale-105 shadow-xl border-2 border-yellow-300"
-                                : "bg-white/10 hover:bg-white/20"
+                            className={`flex items-center justify-between p-4 transition-colors ${isUser ? "bg-red-50" : "hover:bg-slate-50"
                                 }`}
                         >
-                            <div className="flex items-center gap-3">
-                                <span className={`font-bold w-6 text-center ${rank <= 3 ? 'text-yellow-400 text-xl' : 'text-gray-300'}`}>
-                                    {rank}
-                                </span>
-                                <span className={`font-semibold text-lg ${isUser ? "text-white" : ""}`}>
-                                    {player.name}
-                                </span>
+                            <div className="flex items-center gap-4">
+                                <div className="w-8 flex justify-center">
+                                    {rankIcon}
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className={`font-black uppercase italic ${isUser ? "text-primary" : "text-secondary"}`}>
+                                        {player.name}
+                                    </span>
+                                    {isUser && <span className="text-[10px] font-bold text-primary px-1.5 py-0.5 bg-red-100 rounded self-start">YOU</span>}
+                                </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <span className="font-bold text-lg">{player.score}</span>
-                                <span className="text-sm border border-white/30 px-1 rounded text-xs opacity-70">回</span>
-                                {player.badge && !isUser && <span className="text-sm">{player.badge}</span>}
-                                {isUser && <Star className="text-yellow-300 w-5 h-5 animate-spin-slow" />}
+
+                            <div className="flex items-center gap-1">
+                                <span className={`text-2xl font-black italic tabular-nums ${isUser ? "text-primary" : "text-slate-700"}`}>
+                                    {player.score}
+                                </span>
+                                <span className="text-[10px] font-bold text-slate-400 uppercase">reps</span>
                             </div>
-                        </div>
+                        </motion.div>
                     );
                 })}
             </div>
-            <p className="text-center text-xs text-blue-200 mt-4 opacity-70">トップ5選手 (合計回数)</p>
         </div>
     );
 }

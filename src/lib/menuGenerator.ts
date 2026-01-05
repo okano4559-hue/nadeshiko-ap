@@ -21,79 +21,79 @@ export function getDailyMenu(date: Date = new Date()): DailyMenu {
     const menus: Record<number, DailyMenu> = {
         1: { // Monday
             day: "月曜日",
-            theme: "あじりてぃ・すぴーど",
-            description: "今日のテーマ：しゅんぱつりょく！ すばやくうごこう。",
+            theme: "アジリティ・スピード強化",
+            description: "今日のテーマ：瞬発力！一瞬のスピードを磨け。",
             color: "border-nadeshiko-blue",
             items: [
-                { name: "そのばダッシュ", reps: "20回", tips: "うでをしっかりふって！", iconName: "Zap" },
-                { name: "はんぷくよことび", reps: "10回", tips: "サイドにジャンプ！", iconName: "ArrowLeftRight" },
-                { name: "タックジャンプ", reps: "5回", tips: "ひざをむねにひきつける！", iconName: "ArrowUpFromLine" },
+                { name: "その場ダッシュ", reps: "20回", tips: "腕をしっかり振れ！", iconName: "Zap" },
+                { name: "反復横跳び", reps: "10回", tips: "素早くサイドへステップ！", iconName: "ArrowLeftRight" },
+                { name: "タックジャンプ", reps: "5回", tips: "膝を胸に引きつける！", iconName: "ArrowUpFromLine" },
             ]
         },
         2: { // Tuesday
             day: "火曜日",
-            theme: "たいかん・バランス",
-            description: "今日のテーマ：ぐらぐらしない！ まっすぐなからだ。",
+            theme: "体幹・バランス強化",
+            description: "今日のテーマ：ブレない軸！ フィジカルの基礎を作れ。",
             color: "border-nadeshiko-red",
             items: [
-                { name: "くまさんあるき", reps: "10ぽ", tips: "おしりをたかくあげてあるこう", iconName: "Footprints" },
-                { name: "フラミンゴのポーズ", reps: "10秒キープ", tips: "かたあしでバランス！", iconName: "Activity" },
-                { name: "プランク", reps: "10秒", tips: "せなかをまっすぐに", iconName: "Minus" },
+                { name: "ベアウォーク", reps: "10歩", tips: "殿部を高く保て", iconName: "Footprints" },
+                { name: "フラミンゴポーズ", reps: "10秒キープ", tips: "片足でバランスを崩すな！", iconName: "Activity" },
+                { name: "プランク", reps: "10秒", tips: "背筋を一直線に保て", iconName: "Minus" },
             ]
         },
         3: { // Wednesday
             day: "水曜日",
-            theme: "パワー・足のちから",
-            description: "今日のテーマ：じぇっときかく！ じめんをけろう。",
+            theme: "パワー・脚力強化",
+            description: "今日のテーマ：ジェット企画！ 地面を強く蹴り出せ。",
             color: "border-nadeshiko-light",
             items: [
-                { name: "カエルとび", reps: "10回", tips: "てをゆかについてからジャンプ", iconName: "Rabbit" },
-                { name: "スクワット", reps: "10回", tips: "いすにすわるように", iconName: "ArrowDown" },
-                { name: "ランジ", reps: "10回", tips: "おおきくいっぽまえへ", iconName: "MoveHorizontal" },
+                { name: "フロッグジャンプ", reps: "10回", tips: "手をついてから爆発的にジャンプ！", iconName: "Rabbit" },
+                { name: "スクワット", reps: "10回", tips: "椅子に座るイメージで腰を落とせ", iconName: "ArrowDown" },
+                { name: "ランジ", reps: "10回", tips: "大きく一歩前へ踏み込め", iconName: "MoveHorizontal" },
             ]
         },
         4: { // Thursday
             day: "木曜日",
-            theme: "ゆうさんそ・スタミナ",
-            description: "今日のテーマ：つかれないからだ！ さいごまでげんきに。",
+            theme: "有酸素・スタミナ強化",
+            description: "今日のテーマ：尽きない体力！ 試合終了まで走り抜けろ。",
             color: "border-nadeshiko-blue",
             items: [
-                { name: "ジャンピングジャック", reps: "15回", tips: "てとあしをパカっとひらく", iconName: "Combine" },
-                { name: "マウンテンクライマー", reps: "20回", tips: "やべをのぼるようにあしをうごかす", iconName: "TrendingUp" },
-                { name: "バーピー（ジャンプなし）", reps: "5回", tips: "たって、ねて、たつ！", iconName: "Repeat" },
+                { name: "ジャンピングジャック", reps: "15回", tips: "手足を大きく広げろ", iconName: "Combine" },
+                { name: "マウンテンクライマー", reps: "20回", tips: "壁を登るように脚を動かせ", iconName: "TrendingUp" },
+                { name: "バーピー（ジャンプなし）", reps: "5回", tips: "立つ・寝る・立つ！ リズムよく", iconName: "Repeat" },
             ]
         },
         5: { // Friday
             day: "金曜日",
             theme: "コーディネーション",
-            description: "今日のテーマ：あたまをつかう！ おもいどおりに動くかな？",
+            description: "今日のテーマ：脳を活性化！ 身体を思い通りに操れ。",
             color: "border-nadeshiko-red",
             items: [
-                { name: "クロスタッチ", reps: "10回", tips: "みぎてでひだりのあしをさわる", iconName: "Combine" },
-                { name: "バック走", reps: "10ぽ", tips: "うしろむきにはしってみよう", iconName: "Repeat" },
-                { name: "ケンケンパ", reps: "10回", tips: "リズムよく！", iconName: "Footprints" },
+                { name: "クロスタッチ", reps: "10回", tips: "右手で左足をタッチせよ", iconName: "Combine" },
+                { name: "バック走", reps: "10歩", tips: "後方感覚を研ぎ澄ませ", iconName: "Repeat" },
+                { name: "ケンケンパ", reps: "10回", tips: "リズムとバランスを意識しろ！", iconName: "Footprints" },
             ]
         },
         6: { // Saturday
             day: "土曜日",
             theme: "ウィークエンド・チャレンジ",
-            description: "今日のテーマ：１しゅうかんのまとめ！ ぜんぶできるかな？",
+            description: "今日のテーマ：週間総仕上げ！ 全てを出し尽くせ。",
             color: "border-nadeshiko-light",
             items: [
-                { name: "カエルとび", reps: "10回", tips: "たかくジャンプ！", iconName: "Rabbit" },
-                { name: "くまさんあるき", reps: "10ぽ", tips: "のしのしあるこう", iconName: "Footprints" },
-                { name: "そのばダッシュ", reps: "20回", tips: "さいごまで全力！", iconName: "Zap" },
+                { name: "フロッグジャンプ", reps: "10回", tips: "より高く、より遠くへ！", iconName: "Rabbit" },
+                { name: "ベアウォーク", reps: "10歩", tips: "力強く進め", iconName: "Footprints" },
+                { name: "その場ダッシュ", reps: "20回", tips: "最後まで全力で駆け抜けろ！", iconName: "Zap" },
             ]
         },
         0: { // Sunday
             day: "日曜日",
             theme: "スーパーチャレンジ",
-            description: "今日のテーマ：じぶんへのちょうせん！ なんかいできる？",
+            description: "今日のテーマ：己への挑戦！ 限界を超えていけ。",
             color: "border-yellow-500", // Gold for Sunday
             items: [
-                { name: "バーピー", reps: "できるだけ", tips: "1分間でなんかいできる？", iconName: "Rocket" },
-                { name: "スクワット", reps: "できるだけ", tips: "つかれてもやめない！", iconName: "ArrowDown" },
-                { name: "プランク", reps: "できるだけ", tips: "ながくがんばろう", iconName: "Activity" },
+                { name: "バーピー", reps: "限界まで", tips: "1分間で何回できるか挑戦だ", iconName: "Rocket" },
+                { name: "スクワット", reps: "限界まで", tips: "脚が重くなっても止まるな！", iconName: "ArrowDown" },
+                { name: "プランク", reps: "限界まで", tips: "自分との戦いに勝て", iconName: "Activity" },
             ]
         },
     };

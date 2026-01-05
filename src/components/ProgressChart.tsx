@@ -2,42 +2,55 @@
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-// I'll make it self-contained style
 interface ProgressProps {
     data: { date: string; score: number }[];
 }
 
 export function ProgressChart({ data }: ProgressProps) {
     return (
-        <div className="w-full bg-white p-4 rounded-xl shadow-md border border-gray-100">
-            <h3 className="text-lg font-bold text-nadeshiko-blue mb-4">トレーニング記録</h3>
-            <div className="h-[300px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={data} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-                        <XAxis
-                            dataKey="date"
-                            tick={{ fontSize: 12, fill: '#666' }}
-                            stroke="#ccc"
-                        />
-                        <YAxis
-                            tick={{ fontSize: 12, fill: '#666' }}
-                            stroke="#ccc"
-                        />
-                        <Tooltip
-                            contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                        />
-                        <Line
-                            type="monotone"
-                            dataKey="score"
-                            stroke="#000555"
-                            strokeWidth={3}
-                            dot={{ fill: '#B11F24', strokeWidth: 2, r: 4 }}
-                            activeDot={{ r: 6, fill: '#B11F24' }}
-                        />
-                    </LineChart>
-                </ResponsiveContainer>
-            </div>
+        <div className="w-full h-[250px]">
+            <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={data} margin={{ top: 10, right: 10, bottom: 0, left: -20 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                    <XAxis
+                        dataKey="date"
+                        tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 700 }}
+                        stroke="#e2e8f0"
+                        tickLine={false}
+                        axisLine={false}
+                        tickFormatter={(value) => {
+                            const d = new Date(value);
+                            return `${d.getMonth() + 1}/${d.getDate()}`;
+                        }}
+                        dy={10}
+                    />
+                    <YAxis
+                        tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 700 }}
+                        stroke="#e2e8f0"
+                        tickLine={false}
+                        axisLine={false}
+                    />
+                    <Tooltip
+                        contentStyle={{
+                            borderRadius: '12px',
+                            border: 'none',
+                            boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
+                            backgroundColor: '#0F172A',
+                            color: '#fff'
+                        }}
+                        itemStyle={{ color: '#fff', fontWeight: 'bold' }}
+                        labelStyle={{ color: '#94a3b8', fontSize: '12px', marginBottom: '4px' }}
+                    />
+                    <Line
+                        type="monotone"
+                        dataKey="score"
+                        stroke="#E11D48" // Rose 600
+                        strokeWidth={3}
+                        dot={{ fill: '#0F172A', strokeWidth: 2, r: 4, stroke: '#fff' }}
+                        activeDot={{ r: 6, fill: '#E11D48', stroke: '#fff', strokeWidth: 2 }}
+                    />
+                </LineChart>
+            </ResponsiveContainer>
         </div>
     );
 }
