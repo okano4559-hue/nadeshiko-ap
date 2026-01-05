@@ -5,7 +5,8 @@ import { getDailyMenu, DailyMenu } from "@/lib/menuGenerator";
 import { Registration } from "@/components/Registration";
 import { ProgressChart } from "@/components/ProgressChart";
 import { RankingBoard } from "@/components/RankingBoard";
-import { CheckCircle, Activity, Calendar, Trophy, Minus, Plus } from "lucide-react";
+import { CalendarHeatmap } from "@/components/CalendarHeatmap";
+import { CheckCircle, Activity, Calendar, Trophy, Minus, Plus, Pencil, Trash2, Save, X, Edit2, Flame } from "lucide-react";
 import { DynamicIcon } from "@/components/DynamicIcon";
 
 type Record = {
@@ -15,9 +16,18 @@ type Record = {
 
 export default function Home() {
   const [userName, setUserName] = useState<string | null>(null);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [tempName, setTempName] = useState("");
+
   const [menu, setMenu] = useState<DailyMenu | null>(null);
   const [inputScore, setInputScore] = useState<number>(0);
   const [records, setRecords] = useState<Record[]>([]);
+  const [streak, setStreak] = useState(0);
+
+  // Record Editing State
+  const [editingRecordIndex, setEditingRecordIndex] = useState<number | null>(null);
+  const [editScoreValue, setEditScoreValue] = useState<number>(0);
+
   const [showFeedback, setShowFeedback] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -28,8 +38,80 @@ export default function Home() {
   useEffect(() => {
     // Load data
     const storedName = localStorage.getItem("nadeshiko_user_name");
-    const storedRecords = JSON.parse(localStorage.getItem("nadeshiko_records") || "[]");
+    let storedRecords = JSON.parse(localStorage.getItem("nadeshiko_records") || "[]");
 
+    // DATA MIGRATION: Convert "Jan 5" to "2024-01-05"
+    let hasChanges = false;
+    const currentYear = new Date().getFullYear();
+    storedRecords = storedRecords.map((r: Record) => {
+      if (!r.date.includes("-")) {
+        // Assume format is "MMM D" e.g. "Jan 5"
+        const d = new Date(`${r.date} ${currentYear}`);
+        if (!isNaN(d.getTime())) {
+          hasChanges = true;
+          return {
+            ...r,
+            date: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+          };
+        }
+      }
+      return r;
+    });
+
+    if (hasChanges) {
+      localStorage.setItem("nadeshiko_records", JSON.stringify(storedRecords));
+    }
+
+    // STREAK CALCULATION
+    const dates = Array.from(new Set(storedRecords.map((r: Record) => r.date))).sort().reverse() as string[];
+    let currentStreak = 0;
+    if (dates.length > 0) {
+      const today = new Date().toISOString().split('T')[0];
+      const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+
+      let pointer = 0;
+      // Check if the most recent record is today or yesterday
+      if (dates[0] === today) {
+        currentStreak = 1;
+        pointer = 1; // start checking from previous
+      } else if (dates[0] === yesterday) {
+        currentStreak = 1; // streak is alive from yesterday (will be 1 until today is done, or should it be N? User says "if yesterday, +1 logic". Usually streak is "consecutive days ending today or yesterday")
+        // Actually, if last record is yesterday, streak count is based on history.
+        // Let's count completely.
+      } else {
+        // Streak broken
+        currentStreak = 0;
+      }
+
+      // Re-calculate strictly
+      // We need to count backwards from today or yesterday
+      const lastRecordDate = new Date(dates[0] || "");
+      const todayDate = new Date();
+      todayDate.setHours(0, 0, 0, 0);
+      lastRecordDate.setHours(0, 0, 0, 0);
+
+      const diffDays = Math.floor((todayDate.getTime() - lastRecordDate.getTime()) / (1000 * 3600 * 24));
+
+      if (diffDays <= 1) {
+        // Streak is active
+        currentStreak = 1;
+        let checkDate = new Date(lastRecordDate);
+
+        for (let i = 1; i < dates.length; i++) {
+          checkDate.setDate(checkDate.getDate() - 1);
+          const expectedDateStr = `${checkDate.getFullYear()}-${String(checkDate.getMonth() + 1).padStart(2, '0')}-${String(checkDate.getDate()).padStart(2, '0')}`;
+          if (dates[i] === expectedDateStr) {
+            currentStreak++;
+          } else {
+            break;
+          }
+        }
+      } else {
+        currentStreak = 0;
+      }
+    }
+
+    setStreak(currentStreak);
     setUserName(storedName);
     setRecords(storedRecords);
     setMenu(getDailyMenu());
@@ -103,14 +185,31 @@ export default function Home() {
 
   const handleRegister = (name: string) => {
     setUserName(name);
+    localStorage.setItem("nadeshiko_user_name", name);
+  };
+
+  const handleNameEditStart = () => {
+    setTempName(userName || "");
+    setIsEditingName(true);
+  };
+
+  const handleNameSave = () => {
+    if (tempName.trim()) {
+      setUserName(tempName);
+      localStorage.setItem("nadeshiko_user_name", tempName);
+    }
+    setIsEditingName(false);
   };
 
   const handleRecordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (inputScore <= 0) return;
 
+    const today = new Date();
+    const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
     const newRecord = {
-      date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+      date: dateStr,
       score: inputScore,
     };
 
@@ -118,12 +217,64 @@ export default function Home() {
     setRecords(updatedRecords);
     localStorage.setItem("nadeshiko_records", JSON.stringify(updatedRecords));
 
+    // Update streak if this is the first record of the day
+    const alreadyRecordedToday = records.some(r => r.date === dateStr);
+    if (!alreadyRecordedToday) {
+      // Check if yesterday had a record to increment streak
+      // Simplified: just re-run streak logic or increment if valid. 
+      // We can just rely on the effect but we are updating state manually.
+      // Let's just increment streak if it was > 0 (meaning yesterday exists) OR if it was 0 (restart).
+      // Actually, safer to check yesterday.
+      const yesterday = new Date(Date.now() - 86400000);
+      const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
+      const hasYesterday = records.some(r => r.date === yesterdayStr);
+
+      if (hasYesterday) {
+        setStreak(prev => prev + 1);
+      } else {
+        setStreak(1);
+      }
+    }
+
     setShowFeedback(true);
     setInputScore(0);
 
     // Hide feedback after 3s
     setTimeout(() => setShowFeedback(false), 3000);
   };
+
+  // Record Management (Delete)
+  const handleDeleteRecord = (indexToDelete: number) => {
+    if (confirm("本当にこの記録を削除しますか？")) {
+      const updatedRecords = records.filter((_, idx) => idx !== indexToDelete);
+      setRecords(updatedRecords);
+      localStorage.setItem("nadeshiko_records", JSON.stringify(updatedRecords));
+
+      // If we were editing this record, cancel edit
+      if (editingRecordIndex === indexToDelete) {
+        setEditingRecordIndex(null);
+      }
+    }
+  };
+
+  // Record Management (Edit Start)
+  const handleEditRecordStart = (index: number, currentScore: number) => {
+    setEditingRecordIndex(index);
+    setEditScoreValue(currentScore);
+  };
+
+  // Record Management (Edit Save)
+  const handleEditRecordSave = (index: number) => {
+    if (editScoreValue < 0) return; // Basic validation
+
+    const updatedRecords = [...records];
+    updatedRecords[index] = { ...updatedRecords[index], score: editScoreValue };
+
+    setRecords(updatedRecords);
+    localStorage.setItem("nadeshiko_records", JSON.stringify(updatedRecords));
+    setEditingRecordIndex(null);
+  };
+
 
   // Fixed Increment/Decrement Logic
   const handleIncrement = (e: React.MouseEvent) => {
@@ -143,6 +294,14 @@ export default function Home() {
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
+  // Calculated Stats for Ranking
+  const todayObj = new Date();
+  const todayStr = `${todayObj.getFullYear()}-${String(todayObj.getMonth() + 1).padStart(2, '0')}-${String(todayObj.getDate()).padStart(2, '0')}`;
+
+  // Get max score for today, default to 0
+  const todayRecords = records.filter(r => r.date === todayStr);
+  const todayScore = todayRecords.length > 0 ? Math.max(...todayRecords.map(r => r.score)) : 0;
+
 
   if (loading) return <div className="min-h-screen bg-white flex items-center justify-center text-nadeshiko-blue">読み込み中...</div>;
 
@@ -160,7 +319,44 @@ export default function Home() {
       <header className="bg-nadeshiko-blue text-white p-6 sticky top-0 z-10 shadow-md">
         <div className="max-w-md mx-auto flex justify-between items-center">
           <h1 className="text-xl font-bold italic tracking-wider">目指せ日本代表！！</h1>
-          <span className="text-sm font-semibold bg-white/10 px-3 py-1 rounded-full">こんにちは、{userName} 選手</span>
+
+          {/* User Name Area */}
+          <div className="flex items-center gap-2">
+
+            {/* Streak Badge */}
+            <div className="flex items-center gap-1 bg-white/20 text-white px-2 py-1 rounded-full font-bold">
+              <Flame size={16} className={streak > 0 ? "text-orange-400 fill-orange-400" : "text-gray-400"} />
+              <span>{streak}日</span>
+            </div>
+
+            {isEditingName ? (
+              <div className="flex items-center bg-white rounded-full px-2 py-1">
+                <input
+                  type="text"
+                  value={tempName}
+                  onChange={(e) => setTempName(e.target.value)}
+                  className="bg-transparent text-nadeshiko-blue font-bold outline-none w-24 text-sm"
+                  autoFocus
+                />
+                <button onClick={handleNameSave} className="text-green-500 p-1 hover:bg-green-50 rounded-full">
+                  <CheckCircle size={16} />
+                </button>
+                <button onClick={() => setIsEditingName(false)} className="text-gray-400 p-1 hover:bg-gray-100 rounded-full">
+                  <X size={16} />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full">
+                <span className="text-sm font-semibold">こんにちは、{userName} 選手</span>
+                <button
+                  onClick={handleNameEditStart}
+                  className="opacity-70 hover:opacity-100 hover:bg-white/20 p-1 rounded-full transition"
+                >
+                  <Pencil size={12} />
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
@@ -187,7 +383,7 @@ export default function Home() {
 
           {timerPhase === "PREP" && (
             <div className="py-2">
-              <p className="text-lg font-bold opacity-80 mb-2">じゅんびしてね！</p>
+              <p className="text-lg font-bold opacity-80 mb-2">準備してね！</p>
               <div className="text-8xl font-black text-white animate-bounce">
                 {timeLeft}
               </div>
@@ -212,7 +408,7 @@ export default function Home() {
 
           {timerPhase === "FINISHED" && (
             <div className="py-4">
-              <h2 className="text-3xl font-bold mb-2">しゅうりょう！！</h2>
+              <h2 className="text-3xl font-bold mb-2">終了！！</h2>
               <p className="mb-4">おつかれさま！回数を入力してね。</p>
               <button
                 onClick={() => setTimerPhase("IDLE")}
@@ -232,7 +428,7 @@ export default function Home() {
                 <Calendar size={18} />
                 <span className="font-bold">{menu.day}</span>
               </div>
-              <span className="text-xs font-bold bg-nadeshiko-red text-white px-2 py-0.5 rounded uppercase">きょうのメニュー</span>
+              <span className="text-xs font-bold bg-nadeshiko-red text-white px-2 py-0.5 rounded uppercase">今日のメニュー</span>
             </div>
 
             <div className="p-5">
@@ -261,7 +457,7 @@ export default function Home() {
         <section className="bg-white p-5 rounded-xl shadow-md">
           <h3 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
             <Activity className="text-nadeshiko-blue" size={20} />
-            結果をきろくする
+            結果を記録する
           </h3>
 
           <p className="text-sm text-gray-500 mb-2">10分間で何回できたか入力してね</p>
@@ -296,16 +492,96 @@ export default function Home() {
               disabled={inputScore <= 0}
               className="w-full bg-nadeshiko-blue text-white font-bold px-6 py-4 rounded-xl shadow-lg hover:bg-blue-900 transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed text-xl"
             >
-              かんりょう！
+              記録を保存
             </button>
           </form>
         </section>
 
-        {/* Charts */}
-        <ProgressChart data={records} />
-
         {/* Ranking */}
-        <RankingBoard />
+        <RankingBoard userName={userName} userScore={todayScore} />
+
+        {/* Charts & History */}
+        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+          <ProgressChart data={records} />
+
+          {/* Calendar Heatmap */}
+          <div className="px-4 pb-4">
+            <CalendarHeatmap records={records} />
+          </div>
+
+          {/* Records History List */}
+          <div className="p-4 border-t border-gray-100">
+            <h4 className="font-bold text-gray-700 mb-3 text-sm flex items-center gap-2">
+              <Calendar size={16} /> 過去の記録
+            </h4>
+
+            {records.length === 0 ? (
+              <p className="text-center text-gray-400 text-sm py-4">まだ記録がありません</p>
+            ) : (
+              <div className="space-y-2 max-h-60 overflow-y-auto">
+                {[...records].reverse().map((record, reverseIndex) => {
+                  // Calculate actual index in original array
+                  const originalIndex = records.length - 1 - reverseIndex;
+                  const isEditing = editingRecordIndex === originalIndex;
+
+                  return (
+                    <div key={originalIndex} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-semibold text-gray-500 w-12">{record.date}</span>
+
+                        {isEditing ? (
+                          <input
+                            type="number"
+                            value={editScoreValue}
+                            onChange={(e) => setEditScoreValue(Number(e.target.value))}
+                            className="w-20 px-2 py-1 rounded border border-nadeshiko-blue outline-none font-bold text-lg"
+                            autoFocus
+                          />
+                        ) : (
+                          <span className="font-bold text-gray-800 text-lg">{record.score}<span className="text-xs font-normal ml-1">回</span></span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {isEditing ? (
+                          <>
+                            <button
+                              onClick={() => handleEditRecordSave(originalIndex)}
+                              className="p-2 text-green-600 hover:bg-green-100 rounded-full"
+                            >
+                              <Save size={18} />
+                            </button>
+                            <button
+                              onClick={() => setEditingRecordIndex(null)}
+                              className="p-2 text-gray-400 hover:bg-gray-200 rounded-full"
+                            >
+                              <X size={18} />
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              onClick={() => handleEditRecordStart(originalIndex, record.score)}
+                              className="p-2 text-gray-400 hover:text-nadeshiko-blue hover:bg-blue-50 rounded-full transition"
+                            >
+                              <Edit2 size={16} />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteRecord(originalIndex)}
+                              className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
 
       </div>
 

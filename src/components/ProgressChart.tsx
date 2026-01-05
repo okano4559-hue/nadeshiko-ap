@@ -10,7 +10,7 @@ interface ProgressProps {
 export function ProgressChart({ data }: ProgressProps) {
     return (
         <div className="w-full bg-white p-4 rounded-xl shadow-md border border-gray-100">
-            <h3 className="text-lg font-bold text-nadeshiko-blue mb-4">トレーニングのきろく</h3>
+            <h3 className="text-lg font-bold text-nadeshiko-blue mb-4">トレーニング記録</h3>
             <div className="h-[300px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={data} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
