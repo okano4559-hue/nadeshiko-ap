@@ -44,20 +44,26 @@ export function RecordTab({
                 <div className="relative z-10 flex flex-col items-center">
                     <div className="flex items-center gap-2 mb-1 text-slate-400 text-sm font-bold uppercase tracking-wider">
                         <Flame size={16} className="text-primary animate-pulse" />
-                        <span>Current Streak</span>
+                        <span className="text-xs">CURRENT STREAK</span>
                     </div>
-                    <div className="flex items-baseline gap-2">
-                        <span className="text-7xl font-black italic tracking-tighter">{streak}</span>
-                        <span className="text-xl font-bold text-slate-400">Days</span>
+                    <div className="flex flex-col items-center">
+                        <span className="text-3xl font-black text-white italic tracking-tighter mb-1">🔥 連続チャレンジ</span>
+                        <div className="flex items-baseline gap-2">
+                            <span className="text-7xl font-black italic tracking-tighter">{streak}</span>
+                            <span className="text-xl font-bold text-slate-400">日連続！</span>
+                        </div>
                     </div>
                 </div>
             </motion.div>
 
             {/* Input Section */}
             <section className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
-                <h3 className="flex items-center gap-2 text-lg font-black italic text-secondary mb-4">
-                    <Activity size={20} className="text-primary" />
-                    TODAY'S RESULT
+                <h3 className="flex flex-col mb-4">
+                    <span className="flex items-center gap-2 text-lg font-black italic text-secondary">
+                        <Activity size={20} className="text-primary" />
+                        今日のスコア
+                    </span>
+                    <span className="text-[10px] font-bold text-slate-400 pl-7 uppercase tracking-wider">TODAY'S RESULT</span>
                 </h3>
 
                 <form onSubmit={onSubmit} className="flex flex-col gap-4">
@@ -78,7 +84,7 @@ export function RecordTab({
                                 onChange={(e) => setInputScore(Number(e.target.value))}
                                 className="text-5xl font-black text-secondary bg-transparent text-center w-full outline-none p-0 m-0 tabular-nums leading-none"
                             />
-                            <span className="text-xs font-bold text-slate-400 mt-1 block uppercase tracking-widest">Reps</span>
+                            <span className="text-lg font-bold text-secondary mt-1 block">回</span>
                         </div>
 
                         <motion.button
@@ -98,7 +104,10 @@ export function RecordTab({
                         className="w-full bg-secondary text-white font-bold py-4 rounded-xl shadow-lg hover:bg-slate-800 transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed text-lg flex items-center justify-center gap-2"
                     >
                         <Save size={20} />
-                        SAVE RECORD
+                        <div className="flex flex-col items-center leading-none">
+                            <span>記録を保存する</span>
+                            <span className="text-[10px] font-normal opacity-70">SAVE RECORD</span>
+                        </div>
                     </motion.button>
                 </form>
             </section>
@@ -108,7 +117,10 @@ export function RecordTab({
                 <div className="bg-white rounded-3xl shadow-sm overflow-hidden border border-slate-100 p-4">
                     <div className="flex items-center gap-2 mb-4">
                         <TrendingUp size={20} className="text-primary" />
-                        <h4 className="font-bold text-secondary">Progress Chart</h4>
+                        <div>
+                            <h4 className="font-bold text-secondary leading-none">成長グラフ</h4>
+                            <span className="text-[10px] text-slate-400 font-bold uppercase">PROGRESS CHART</span>
+                        </div>
                     </div>
                     <ProgressChart data={records} />
                 </div>
@@ -116,7 +128,10 @@ export function RecordTab({
                 <div className="bg-white rounded-3xl shadow-sm overflow-hidden border border-slate-100 p-4">
                     <div className="flex items-center gap-2 mb-4">
                         <Calendar size={20} className="text-primary" />
-                        <h4 className="font-bold text-secondary">Activity Log</h4>
+                        <div>
+                            <h4 className="font-bold text-secondary leading-none">カレンダー</h4>
+                            <span className="text-[10px] text-slate-400 font-bold uppercase">ACTIVITY LOG</span>
+                        </div>
                     </div>
                     <CalendarHeatmap records={records} />
                 </div>
@@ -125,15 +140,18 @@ export function RecordTab({
             {/* History List */}
             <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
                 <div className="p-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
-                    <h4 className="font-bold text-secondary text-sm uppercase tracking-wider">Recent History</h4>
-                    <span className="text-xs font-bold text-slate-400">{records.length} Records</span>
+                    <div>
+                        <h4 className="font-bold text-secondary text-sm">これまでの記録</h4>
+                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">RECENT HISTORY</span>
+                    </div>
+                    <span className="text-xs font-bold text-slate-400">全 {records.length} 件</span>
                 </div>
 
                 <div className="divide-y divide-slate-100 max-h-80 overflow-y-auto">
                     {records.length === 0 ? (
                         <div className="p-8 text-center text-slate-400">
-                            <p className="text-sm font-bold">No records yet.</p>
-                            <p className="text-xs mt-1">Start your training today!</p>
+                            <p className="text-sm font-bold">まだ記録がないよ。</p>
+                            <p className="text-xs mt-1">まずは1回やってみよう！</p>
                         </div>
                     ) : (
                         [...records].reverse().map((record, reverseIndex) => {
@@ -148,7 +166,7 @@ export function RecordTab({
                                 >
                                     <div className="flex items-center gap-4">
                                         <div className="flex flex-col">
-                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Date</span>
+                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">DATE</span>
                                             <span className="text-sm font-bold text-secondary">{record.date}</span>
                                         </div>
 
@@ -166,7 +184,7 @@ export function RecordTab({
                                                 />
                                             ) : (
                                                 <span className="text-lg font-black text-secondary italic">
-                                                    {record.score} <span className="text-xs font-normal text-slate-400 not-italic">reps</span>
+                                                    {record.score} <span className="text-xs font-normal text-slate-400 not-italic">回</span>
                                                 </span>
                                             )}
                                         </div>

@@ -113,7 +113,7 @@ export const CalendarHeatmap = ({ records }: CalendarHeatmapProps) => {
 
             <div className="mt-4 text-[10px] text-center text-slate-400 flex items-center justify-center gap-2 font-bold uppercase tracking-widest">
                 <div className="w-2 h-2 bg-secondary rounded-full"></div>
-                <span>Training Days</span>
+                <span>トレーニングした日</span>
             </div>
         </div>
     );
