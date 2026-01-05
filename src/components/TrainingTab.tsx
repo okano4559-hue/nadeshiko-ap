@@ -104,7 +104,7 @@ export function TrainingTab({
                     <div className="p-2 bg-slate-100 rounded-lg text-secondary">
                         <Clock size={20} />
                     </div>
-                    <h3 className="text-lg font-bold text-secondary">タイムトライアル</h3>
+                    <h3 className="text-lg font-bold text-secondary">トレーニング開始</h3>
                 </div>
 
                 <div className="flex flex-col items-center justify-center py-4">
