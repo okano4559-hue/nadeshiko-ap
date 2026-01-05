@@ -11,6 +11,7 @@ interface TrainingTabProps {
     setIsEditingName: (isEditing: boolean) => void;
     handleNameSave: () => void;
     handleNameEditStart: () => void;
+    rank: string; // New Prop
 
     timerPhase: "IDLE" | "PREP" | "WORK" | "FINISHED";
     timeLeft: number;
@@ -22,7 +23,7 @@ interface TrainingTabProps {
 }
 
 export function TrainingTab({
-    userName, isEditingName, tempName, setTempName, setIsEditingName, handleNameSave, handleNameEditStart,
+    userName, isEditingName, tempName, setTempName, setIsEditingName, handleNameSave, handleNameEditStart, rank,
     timerPhase, timeLeft, formatTime, handleStartTimer, setTimerPhase,
     menu
 }: TrainingTabProps) {
@@ -33,33 +34,42 @@ export function TrainingTab({
                 <h1 className="text-2xl font-black italic tracking-tighter text-secondary">
                     NADESIKO<span className="text-primary">.APP</span>
                 </h1>
-                <div className="relative group">
-                    {isEditingName ? (
-                        <div className="flex items-center bg-white shadow-sm ring-2 ring-primary/20 rounded-full px-3 py-1 animate-in fade-in zoom-in duration-200">
-                            <input
-                                type="text"
-                                value={tempName}
-                                onChange={(e) => setTempName(e.target.value)}
-                                className="bg-transparent text-secondary font-bold outline-none w-24 text-sm"
-                                autoFocus
-                            />
-                            <button onClick={handleNameSave} className="ml-1 text-green-600 hover:text-green-700 p-1">
-                                <CheckCircle size={18} />
-                            </button>
-                            <button onClick={() => setIsEditingName(false)} className="ml-1 text-slate-400 hover:text-slate-600 p-1">
-                                <X size={18} />
-                            </button>
-                        </div>
-                    ) : (
-                        <motion.button
-                            layout
-                            onClick={handleNameEditStart}
-                            className="flex items-center gap-2 px-3 py-1.5 bg-white rounded-full shadow-sm border border-slate-100 active:scale-95 transition-transform"
-                        >
-                            <span className="text-sm font-bold text-slate-700">{userName} 選手</span>
-                            <Pencil size={14} className="text-slate-400" />
-                        </motion.button>
-                    )}
+                <div className="flex flex-col items-end gap-1">
+                    {/* Rank Badge */}
+                    <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full border bg-white/50 backdrop-blur-sm ${getRankColor(rank)}`}>
+                        <Award size={12} className="stroke-[3]" />
+                        <span className="text-[10px] font-black tracking-wider uppercase">
+                            {rank}
+                        </span>
+                    </div>
+                    <div className="relative group">
+                        {isEditingName ? (
+                            <div className="flex items-center bg-white shadow-sm ring-2 ring-primary/20 rounded-full px-3 py-1 animate-in fade-in zoom-in duration-200">
+                                <input
+                                    type="text"
+                                    value={tempName}
+                                    onChange={(e) => setTempName(e.target.value)}
+                                    className="bg-transparent text-secondary font-bold outline-none w-24 text-sm"
+                                    autoFocus
+                                />
+                                <button onClick={handleNameSave} className="ml-1 text-green-600 hover:text-green-700 p-1">
+                                    <CheckCircle size={18} />
+                                </button>
+                                <button onClick={() => setIsEditingName(false)} className="ml-1 text-slate-400 hover:text-slate-600 p-1">
+                                    <X size={18} />
+                                </button>
+                            </div>
+                        ) : (
+                            <motion.button
+                                layout
+                                onClick={handleNameEditStart}
+                                className="flex items-center gap-2 px-3 py-1.5 bg-white rounded-full shadow-sm border border-slate-100 active:scale-95 transition-transform"
+                            >
+                                <span className="text-sm font-bold text-slate-700">{userName} 選手</span>
+                                <Pencil size={14} className="text-slate-400" />
+                            </motion.button>
+                        )}
+                    </div>
                 </div>
             </header>
 

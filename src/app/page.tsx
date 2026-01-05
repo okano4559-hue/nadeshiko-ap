@@ -7,6 +7,8 @@ import { BottomNavigation } from "@/components/BottomNavigation";
 import { TrainingTab } from "@/components/TrainingTab";
 import { RecordTab } from "@/components/RecordTab";
 import { RankingTab } from "@/components/RankingTab";
+import { ResultModal } from "@/components/ResultModal"; // New Import
+import { getRank } from "@/lib/utils"; // New Import
 import { Trophy } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -34,7 +36,9 @@ export default function Home() {
   const [editingRecordIndex, setEditingRecordIndex] = useState<number | null>(null);
   const [editScoreValue, setEditScoreValue] = useState<number>(0);
 
-  const [showFeedback, setShowFeedback] = useState(false);
+  const [showResultModal, setShowResultModal] = useState(false); // New State
+  const [latestRecordScore, setLatestRecordScore] = useState(0); // New State
+
   const [loading, setLoading] = useState(true);
 
   // Timer State
@@ -258,9 +262,9 @@ export default function Home() {
       }
     }
 
-    setShowFeedback(true);
+    setShowResultModal(true); // Updated to show new modal
+    setLatestRecordScore(inputScore);
     setInputScore(0);
-    setTimeout(() => setShowFeedback(false), 3000);
   };
 
   // Record Management (Delete)
@@ -320,6 +324,10 @@ export default function Home() {
   const todayRecords = records.filter(r => r.date === todayStr);
   const todayScore = todayRecords.length > 0 ? Math.max(...todayRecords.map(r => r.score)) : 0;
 
+  // Calculate Total Score & Rank
+  const totalScore = records.reduce((acc, r) => acc + r.score, 0);
+  const currentRank = getRank(totalScore);
+
 
   if (loading) return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center">
@@ -358,6 +366,7 @@ export default function Home() {
                 setIsEditingName={setIsEditingName}
                 handleNameSave={handleNameSave}
                 handleNameEditStart={handleNameEditStart}
+                rank={currentRank} // Pass calculated rank
                 timerPhase={timerPhase}
                 timeLeft={timeLeft}
                 formatTime={formatTime}
@@ -415,29 +424,14 @@ export default function Home() {
       {/* Bottom Navigation */}
       <BottomNavigation activeTab={activeTab} onTabChange={setActiveTab} />
 
-      {/* Feedback Modal / Overlay */}
-      <AnimatePresence>
-        {showFeedback && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 flex items-center justify-center z-50 bg-black/60 backdrop-blur-sm px-4"
-          >
-            <motion.div
-              initial={{ scale: 0.8, y: 50 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.8, y: 50 }}
-              className="bg-white p-8 rounded-3xl shadow-2xl text-center w-full max-w-xs relative overflow-hidden"
-            >
-              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-yellow-400 to-orange-500"></div>
-              <Trophy className="mx-auto text-yellow-500 mb-4 h-20 w-20 drop-shadow-lg animate-bounce" />
-              <h2 className="text-3xl font-black text-secondary mb-2 italic">GREAT JOB!</h2>
-              <p className="text-slate-500 font-bold">その調子で強くなれ！</p>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Result Celebration Modal */}
+      <ResultModal
+        isOpen={showResultModal}
+        onClose={() => setShowResultModal(false)}
+        score={latestRecordScore}
+        streak={streak}
+        rank={currentRank}
+      />
     </main>
   );
 }
