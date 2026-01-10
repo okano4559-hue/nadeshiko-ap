@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { getDailyMenu, DailyMenu } from "@/lib/menuGenerator";
+import { getDailyMenu, TrainingItem } from "@/lib/menuGenerator";
 import { Registration } from "@/components/Registration";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { TrainingTab } from "@/components/TrainingTab";
@@ -24,7 +24,7 @@ export default function Home() {
   const [isEditingName, setIsEditingName] = useState(false);
   const [tempName, setTempName] = useState("");
 
-  const [menu, setMenu] = useState<DailyMenu | null>(null);
+  const [menu, setMenu] = useState<TrainingItem[] | null>(null);
   const [inputScore, setInputScore] = useState<number>(0);
   const [records, setRecords] = useState<Record[]>([]);
   const [streak, setStreak] = useState(0);

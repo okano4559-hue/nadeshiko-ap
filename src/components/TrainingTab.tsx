@@ -1,6 +1,6 @@
-import { DailyMenu } from "@/lib/menuGenerator";
+import { TrainingItem } from "@/lib/menuGenerator";
 import { DynamicIcon } from "@/components/DynamicIcon";
-import { Activity, Calendar, Pencil, CheckCircle, X, Clock, Play, RotateCcw, Award } from "lucide-react";
+import { Award, Calendar, CheckCircle, Clock, Pencil, Play, RotateCcw, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getRankColor } from "@/lib/utils";
 
@@ -12,7 +12,7 @@ interface TrainingTabProps {
     setIsEditingName: (isEditing: boolean) => void;
     handleNameSave: () => void;
     handleNameEditStart: () => void;
-    rank: string; // New Prop
+    rank: string;
 
     timerPhase: "IDLE" | "PREP" | "WORK" | "FINISHED";
     timeLeft: number;
@@ -20,7 +20,7 @@ interface TrainingTabProps {
     handleStartTimer: () => void;
     setTimerPhase: (phase: "IDLE" | "PREP" | "WORK" | "FINISHED") => void;
 
-    menu: DailyMenu | null;
+    menu: TrainingItem[] | null;
 }
 
 export function TrainingTab({
@@ -77,30 +77,27 @@ export function TrainingTab({
             {/* Today's Mission (Hero) */}
             {menu && (
                 <section className="relative overflow-hidden rounded-3xl shadow-xl bg-secondary text-white p-6">
-                    <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
-                        <Activity size={120} />
-                    </div>
-
                     <div className="relative z-10">
                         <div className="flex items-center gap-2 mb-2 text-primary-foreground/80">
                             <Calendar size={16} />
-                            <span className="text-xs font-bold uppercase tracking-widest">{menu.day}のミッション</span>
+                            <span className="text-xs font-bold uppercase tracking-widest">今日のメニュー</span>
                         </div>
-                        <h2 className="text-3xl font-black italic mb-2 leading-none">{menu.theme}</h2>
-                        <p className="text-slate-300 text-sm mb-6 line-clamp-2">{menu.description}</p>
+                        <h2 className="text-2xl font-black italic mb-6 leading-none">神経系コーディネーション</h2>
 
                         <div className="space-y-3">
-                            {menu.items.map((item, idx) => (
+                            {menu.map((item, idx) => (
                                 <div key={idx} className="flex items-center gap-4 bg-white/5 p-3 rounded-xl border border-white/10 backdrop-blur-sm">
-                                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary">
-                                        <DynamicIcon name={item.iconName} size={20} />
+                                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-2xl">
+                                        {item.emoji}
                                     </div>
                                     <div className="flex-1">
                                         <h4 className="font-bold text-sm">{item.name}</h4>
-                                        <p className="text-xs text-slate-400">コツ: {item.tips || "がんばれ！"}</p>
+                                        <p className="text-xs text-slate-400 mt-1">{item.instruction}</p>
                                     </div>
                                     <div className="text-right">
-                                        <span className="block text-xl font-black text-primary italic">{item.reps}</span>
+                                        <span className="block text-lg font-black text-primary italic whitespace-nowrap">
+                                            {item.value}<span className="text-xs ml-0.5">{item.type === 'duration' ? '秒' : '回'}</span>
+                                        </span>
                                     </div>
                                 </div>
                             ))}
