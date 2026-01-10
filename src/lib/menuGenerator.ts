@@ -14,86 +14,189 @@ export type DailyMenu = {
 };
 
 export function getDailyMenu(date: Date = new Date()): DailyMenu {
-    // Ensure we are working with Japan time if determining "Today"
-    // For simplicity broadly, we just take the day index.
     const dayIndex = date.getDay();
 
     const menus: Record<number, DailyMenu> = {
-        1: { // Monday
+        1: { // Monday: Rhythm & Unilateral
             day: "月曜日",
-            theme: "アジリティ・スピード強化",
-            description: "今日のテーマ：瞬発力！一瞬のスピードを磨け。",
+            theme: "リズム＆片足バランス",
+            description: "今日のテーマ：音楽のように動け！ 片足でもグラつくな。",
             color: "border-nadeshiko-blue",
             items: [
-                { name: "その場ダッシュ", reps: "20回", tips: "腕をしっかり振れ！", iconName: "Zap" },
-                { name: "反復横跳び", reps: "10回", tips: "素早くサイドへステップ！", iconName: "ArrowLeftRight" },
-                { name: "タックジャンプ", reps: "5回", tips: "膝を胸に引きつける！", iconName: "ArrowUpFromLine" },
+                {
+                    name: "リズム・タッチダウン⚡️",
+                    reps: "左右10回",
+                    tips: "片足立ちで床をタッチ！膝をグラグラさせるな！",
+                    iconName: "Zap"
+                },
+                {
+                    name: "忍者ステップ🥷",
+                    reps: "20回",
+                    tips: "音を立てずに素早く足を入れ替えろ！",
+                    iconName: "Footprints"
+                },
+                {
+                    name: "片足ケンケンDASH💨",
+                    reps: "10回",
+                    tips: "地面を強く弾いて前進だ！",
+                    iconName: "Activity"
+                },
             ]
         },
-        2: { // Tuesday
+        2: { // Tuesday: Balance & Plyo
             day: "火曜日",
-            theme: "体幹・バランス強化",
-            description: "今日のテーマ：ブレない軸！ フィジカルの基礎を作れ。",
+            theme: "空中バランス＆パワー",
+            description: "今日のテーマ：空中で止まれ！ 着地まで美しく。",
             color: "border-nadeshiko-red",
             items: [
-                { name: "ベアウォーク", reps: "10歩", tips: "殿部を高く保て", iconName: "Footprints" },
-                { name: "フラミンゴポーズ", reps: "10秒キープ", tips: "片足でバランスを崩すな！", iconName: "Activity" },
-                { name: "プランク", reps: "10秒", tips: "背筋を一直線に保て", iconName: "Minus" },
+                {
+                    name: "飛行機バランス✈️",
+                    reps: "左右10秒",
+                    tips: "背中から足先まで一直線！フラフラするな！",
+                    iconName: "Send" // Looks like a paper plane
+                },
+                {
+                    name: "ロケット・ランジ🚀",
+                    reps: "10回",
+                    tips: "空中で足を入れ替えろ！高く飛び上がれ！",
+                    iconName: "Rocket"
+                },
+                {
+                    name: "スケータージャンプ⛸️",
+                    reps: "20回",
+                    tips: "横に大きくジャンプ！ピタッと止まれ！",
+                    iconName: "MoveHorizontal"
+                },
             ]
         },
-        3: { // Wednesday
+        3: { // Wednesday: Coupling & Control (Multi-task)
             day: "水曜日",
-            theme: "パワー・脚力強化",
-            description: "今日のテーマ：ジェット企画！ 地面を強く蹴り出せ。",
+            theme: "マルチタスク・脳トレ",
+            description: "今日のテーマ：手と足で違う動き！ 脳みそフル回転だ。",
             color: "border-nadeshiko-light",
             items: [
-                { name: "フロッグジャンプ", reps: "10回", tips: "手をついてから爆発的にジャンプ！", iconName: "Rabbit" },
-                { name: "スクワット", reps: "10回", tips: "椅子に座るイメージで腰を落とせ", iconName: "ArrowDown" },
-                { name: "ランジ", reps: "10回", tips: "大きく一歩前へ踏み込め", iconName: "MoveHorizontal" },
+                {
+                    name: "手拍子スクワット👏",
+                    reps: "15回",
+                    tips: "しゃがんでパン！立ってパン！ リズムを崩すな！",
+                    iconName: "Music"
+                },
+                {
+                    name: "8の字ループ♾️",
+                    reps: "10周",
+                    tips: "足の間でボール（空気）を8の字に回せ！",
+                    iconName: "Infinity"
+                },
+                {
+                    name: "V字ビーム・キープ✨",
+                    reps: "10秒x3",
+                    tips: "お腹に力を入れてVの字を作る！プルプルしても耐えろ！",
+                    iconName: "ChevronUp"
+                },
             ]
         },
-        4: { // Thursday
+        4: { // Thursday: Reaction & Agility
             day: "木曜日",
-            theme: "有酸素・スタミナ強化",
-            description: "今日のテーマ：尽きない体力！ 試合終了まで走り抜けろ。",
+            theme: "反射神経・スピード",
+            description: "今日のテーマ：稲妻より速く！ 合図に反応せよ。",
             color: "border-nadeshiko-blue",
             items: [
-                { name: "ジャンピングジャック", reps: "15回", tips: "手足を大きく広げろ", iconName: "Combine" },
-                { name: "マウンテンクライマー", reps: "20回", tips: "壁を登るように脚を動かせ", iconName: "TrendingUp" },
-                { name: "バーピー（ジャンプなし）", reps: "5回", tips: "立つ・寝る・立つ！ リズムよく", iconName: "Repeat" },
+                {
+                    name: "プッシュアップ＆クラップ💥",
+                    reps: "10回",
+                    tips: "腕立てジャンプで手を叩け！できないなら膝つきOK！",
+                    iconName: "Activity"
+                },
+                {
+                    name: "ジグザグ・ラビット🐰",
+                    reps: "20回",
+                    tips: "前後左右に素早くジャンプ！地面に足をつけるな！",
+                    iconName: "Rabbit"
+                },
+                {
+                    name: "スパイダーウォーク🕷️",
+                    reps: "10歩",
+                    tips: "低姿勢で手足を交互に出せ！クモになりきれ！",
+                    iconName: "Bug"
+                },
             ]
         },
-        5: { // Friday
+        5: { // Friday: Difficulty Control
             day: "金曜日",
-            theme: "コーディネーション",
-            description: "今日のテーマ：脳を活性化！ 身体を思い通りに操れ。",
+            theme: "究極のボディコントロール",
+            description: "今日のテーマ：石像になれ！ 1ミリも動くな。",
             color: "border-nadeshiko-red",
             items: [
-                { name: "クロスタッチ", reps: "10回", tips: "右手で左足をタッチせよ", iconName: "Combine" },
-                { name: "バック走", reps: "10歩", tips: "後方感覚を研ぎ澄ませ", iconName: "Repeat" },
-                { name: "ケンケンパ", reps: "10回", tips: "リズムとバランスを意識しろ！", iconName: "Footprints" },
+                {
+                    name: "石像チャレンジ🗿",
+                    reps: "20秒",
+                    tips: "プランクの姿勢で絶対動くな！呼吸も静かに...",
+                    iconName: "Square" // Block/Statue like
+                },
+                {
+                    name: "片足・星を描く⭐️",
+                    reps: "左右5周",
+                    tips: "片足立ちで、もう片方の足で空中に星を描け！",
+                    iconName: "Star"
+                },
+                {
+                    name: "タックジャンプ・キャノン💣",
+                    reps: "10回",
+                    tips: "空中で膝を抱え込め！着地は静かに忍者！",
+                    iconName: "ArrowUpFromLine"
+                },
             ]
         },
-        6: { // Saturday
+        6: { // Saturday: Weekend Power
             day: "土曜日",
-            theme: "ウィークエンド・チャレンジ",
-            description: "今日のテーマ：週間総仕上げ！ 全てを出し尽くせ。",
+            theme: "パワー＆エクスプロージョン",
+            description: "今日のテーマ：爆発力！ 全身のバネを使え。",
             color: "border-nadeshiko-light",
             items: [
-                { name: "フロッグジャンプ", reps: "10回", tips: "より高く、より遠くへ！", iconName: "Rabbit" },
-                { name: "ベアウォーク", reps: "10歩", tips: "力強く進め", iconName: "Footprints" },
-                { name: "その場ダッシュ", reps: "20回", tips: "最後まで全力で駆け抜けろ！", iconName: "Zap" },
+                {
+                    name: "スーパーマン・ジャンプ🦸‍♀️",
+                    reps: "10回",
+                    tips: "空中で手足を伸ばして飛べ！",
+                    iconName: "Send"
+                },
+                {
+                    name: "ハイ・ニー・ダッシュ🐎",
+                    reps: "30回",
+                    tips: "膝をお腹まで高く上げろ！",
+                    iconName: "TrendingUp"
+                },
+                {
+                    name: "壁倒立ホールド🤸‍♀️",
+                    reps: "10秒",
+                    tips: "壁を使って逆立ちキープ！景色をひっくり返せ！",
+                    iconName: "ChevronsUp"
+                },
             ]
         },
-        0: { // Sunday
+        0: { // Sunday: Master Challenge
             day: "日曜日",
-            theme: "スーパーチャレンジ",
-            description: "今日のテーマ：己への挑戦！ 限界を超えていけ。",
-            color: "border-yellow-500", // Gold for Sunday
+            theme: "なでしこマスター挑戦",
+            description: "今日のテーマ：限界突破！ 昨日の自分を超えていけ。",
+            color: "border-yellow-500", // Gold
             items: [
-                { name: "バーピー", reps: "限界まで", tips: "1分間で何回できるか挑戦だ", iconName: "Rocket" },
-                { name: "スクワット", reps: "限界まで", tips: "脚が重くなっても止まるな！", iconName: "ArrowDown" },
-                { name: "プランク", reps: "限界まで", tips: "自分との戦いに勝て", iconName: "Activity" },
+                {
+                    name: "エンドレス・バーピー🔥",
+                    reps: "限界まで",
+                    tips: "倒れても立ち上がれ！",
+                    iconName: "Flame"
+                },
+                {
+                    name: "片足スクワット（ピストル）🔫",
+                    reps: "できるだけ",
+                    tips: "片足で座って立つ！壁を持ってもいいぞ！",
+                    iconName: "Target"
+                },
+                {
+                    name: "V字バランス・MAX👑",
+                    reps: "限界秒数",
+                    tips: "震えてからが勝負だ！",
+                    iconName: "Crown"
+                },
             ]
         },
     };
