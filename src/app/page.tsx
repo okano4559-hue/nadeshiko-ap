@@ -486,6 +486,7 @@ export default function Home() {
 
   // Calculate Total Score & Rank
   const totalScore = records.reduce((acc, r) => acc + r.score, 0);
+  const totalStamps = records.filter(r => r.stamp_type).length;
   const currentRank = getRank(totalScore);
 
 
@@ -578,6 +579,8 @@ export default function Home() {
                 userName={userName}
                 userScore={todayScore}
                 streak={streak}
+                totalScore={totalScore}
+                totalStamps={totalStamps}
               />
             </motion.div>
           )}

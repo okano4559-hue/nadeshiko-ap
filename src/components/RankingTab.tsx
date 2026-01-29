@@ -6,9 +6,13 @@ interface RankingTabProps {
     userName: string | null;
     userScore: number;
     streak: number;
+    totalScore: number;
+    totalStamps: number;
 }
 
-export function RankingTab({ userName, userScore, streak }: RankingTabProps) {
+import { NadeshikoRoadmap } from "@/components/NadeshikoRoadmap";
+
+export function RankingTab({ userName, userScore, streak, totalScore, totalStamps }: RankingTabProps) {
     return (
         <div className="space-y-6 pb-24 px-4 w-full max-w-md mx-auto pt-6">
 
@@ -31,6 +35,9 @@ export function RankingTab({ userName, userScore, streak }: RankingTabProps) {
 
             {/* Medal Collection */}
             <MedalCollection streak={streak} />
+
+            {/* Nadeshiko Roadmap */}
+            <NadeshikoRoadmap totalScore={totalScore} streak={streak} totalStamps={totalStamps} />
 
             {/* Ranking List */}
             <RankingBoard userName={userName || "Unknown"} userScore={userScore} />
