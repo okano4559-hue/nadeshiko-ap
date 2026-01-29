@@ -3,10 +3,11 @@ import { CalendarHeatmap } from "@/components/CalendarHeatmap";
 import { Activity, Flame, Minus, Plus, Calendar, Save, Edit2, Trash2, X, TrendingUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-type Record = {
-    date: string;
-    score: number;
-};
+import { TrainingRecord, StampType } from "@/lib/types";
+// ... imports
+
+// Use shared type
+type Record = TrainingRecord;
 
 interface RecordTabProps {
     records: Record[];
@@ -183,9 +184,20 @@ export function RecordTab({
                                                     autoFocus
                                                 />
                                             ) : (
-                                                <span className="text-lg font-black text-secondary italic">
-                                                    {record.score} <span className="text-xs font-normal text-slate-400 not-italic">回</span>
-                                                </span>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-lg font-black text-secondary italic">
+                                                        {record.score} <span className="text-xs font-normal text-slate-400 not-italic">回</span>
+                                                    </span>
+                                                    {record.stamp_type && (
+                                                        <motion.div
+                                                            initial={{ scale: 0 }}
+                                                            animate={{ scale: 1 }}
+                                                            className="text-2xl filter drop-shadow-sm"
+                                                        >
+                                                            {getStampEmoji(record.stamp_type)}
+                                                        </motion.div>
+                                                    )}
+                                                </div>
                                             )}
                                         </div>
                                     </div>
@@ -219,4 +231,14 @@ export function RecordTab({
             </div>
         </div>
     );
+}
+
+function getStampEmoji(type: StampType): string {
+    switch (type) {
+        case 'soccer_ball': return '⚽️';
+        case 'fire': return '🔥';
+        case 'star': return '⭐️';
+        case 'thumbs_up': return '👍';
+        default: return '';
+    }
 }
