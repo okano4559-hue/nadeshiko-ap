@@ -77,7 +77,7 @@ export default function Home() {
       const { data, error } = await supabase
         .from('training_records')
         .select('*')
-        .eq('user_id', currentUserId)
+        .eq('user_name', storedName) // Corrected to use user_name
         .order('date', { ascending: true }); // We sort ascending for streak calc usually, but UI might reverse
 
       if (data && !error && data.length > 0) {
@@ -153,7 +153,7 @@ export default function Home() {
       .channel('player_channel')
       .on(
         'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'training_records', filter: `user_id=eq.${currentUserId}` },
+        { event: 'UPDATE', schema: 'public', table: 'training_records', filter: `user_name=eq.${storedName}` },
         (payload) => {
           const newRecord = payload.new as Record;
           // Check if stamp changed
@@ -377,7 +377,7 @@ export default function Home() {
     const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
     const newRecord: Record = {
-      user_id: userId,
+      user_name: userName!, // Use userName (assert non-null as guards exist)
       date: dateStr,
       score: inputScore,
       streak: streak, // Ideally calculated accurately

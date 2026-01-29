@@ -2,7 +2,7 @@ export type StampType = 'soccer_ball' | 'fire' | 'star' | 'thumbs_up' | null;
 
 export interface TrainingRecord {
     id?: string; // Supabase ID (optional for local/optimistic updates)
-    user_id: string; // Identifier for the user
+    user_name: string; // Identifier for the user (using Name as per schema)
     date: string; // YYYY-MM-DD
     score: number;
     streak?: number; // Calculated or stored
