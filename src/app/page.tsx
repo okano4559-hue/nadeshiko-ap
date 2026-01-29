@@ -11,6 +11,7 @@ import { ResultModal } from "@/components/ResultModal"; // New Import
 import { getRank } from "@/lib/utils"; // New Import
 import { Trophy } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import confetti from "canvas-confetti";
 
 import { supabase } from "@/lib/supabase";
 import { TrainingRecord, StampType } from "@/lib/types";
@@ -158,9 +159,17 @@ export default function Home() {
           const newRecord = payload.new as Record;
           // Check if stamp changed
           if (newRecord.stamp_type) {
+            // Trigger Confetti
+            confetti({
+              particleCount: 150,
+              spread: 70,
+              origin: { y: 0.6 },
+              colors: ['#fb7185', '#f472b6', '#fbbf24', '#ffffff'] // Nadeshiko pinks/golds
+            });
+
             setLastStamp(newRecord.stamp_type);
             setShowStampAnim(true);
-            setToastMsg("パパからスタンプが届いたよ！");
+            setToastMsg(`パパからスタンプが届いたよ！ ${getStampEmoji(newRecord.stamp_type)}`);
             setShowToast(true);
           }
           // Update Local State
@@ -598,4 +607,14 @@ export default function Home() {
       />
     </main>
   );
+}
+
+function getStampEmoji(type: StampType): string {
+  switch (type) {
+    case 'soccer_ball': return '⚽️';
+    case 'fire': return '🔥';
+    case 'star': return '⭐️';
+    case 'thumbs_up': return '👍';
+    default: return '';
+  }
 }
