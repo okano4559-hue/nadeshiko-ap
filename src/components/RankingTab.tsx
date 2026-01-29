@@ -1,12 +1,14 @@
 import { RankingBoard } from "@/components/RankingBoard";
+import { MedalCollection } from "@/components/MedalCollection";
 import { Trophy, Crown } from "lucide-react";
 
 interface RankingTabProps {
     userName: string | null;
     userScore: number;
+    streak: number;
 }
 
-export function RankingTab({ userName, userScore }: RankingTabProps) {
+export function RankingTab({ userName, userScore, streak }: RankingTabProps) {
     return (
         <div className="space-y-6 pb-24 px-4 w-full max-w-md mx-auto pt-6">
 
@@ -26,6 +28,9 @@ export function RankingTab({ userName, userScore }: RankingTabProps) {
                     <p className="text-sm font-bold opacity-90">ライバルと競い合え！</p>
                 </div>
             </div>
+
+            {/* Medal Collection */}
+            <MedalCollection streak={streak} />
 
             {/* Ranking List */}
             <RankingBoard userName={userName || "Unknown"} userScore={userScore} />

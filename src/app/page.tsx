@@ -44,6 +44,7 @@ export default function Home() {
   // Timer State
   const [timerPhase, setTimerPhase] = useState<"IDLE" | "PREP" | "WORK" | "FINISHED">("IDLE");
   const [timeLeft, setTimeLeft] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
 
   const audioCtxRef = useRef<AudioContext | null>(null);
 
@@ -153,6 +154,25 @@ export default function Home() {
     }
   };
 
+  const playTripleBeep = () => {
+    try {
+      const ctx = audioCtxRef.current;
+      if (!ctx) return;
+      const now = ctx.currentTime;
+      [0, 0.15, 0.3].forEach(offset => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.frequency.setValueAtTime(880, now + offset);
+        gain.gain.setValueAtTime(0.1, now + offset);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.1);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + offset);
+        osc.stop(now + offset + 0.1);
+      });
+    } catch (e) { console.error(e); }
+  };
+
   // Timer Sound Effect Monitor
   useEffect(() => {
     if (timerPhase === "PREP") {
@@ -177,6 +197,8 @@ export default function Home() {
   useEffect(() => {
     let interval: NodeJS.Timeout;
 
+    if (isPaused) return;
+
     if (timerPhase === "PREP" && timeLeft > 0) {
       interval = setInterval(() => {
         setTimeLeft((prev) => prev - 1);
@@ -189,15 +211,30 @@ export default function Home() {
     } else if (timerPhase === "WORK" && timeLeft > 0) {
       interval = setInterval(() => {
         setTimeLeft((prev) => {
-          // Last 5 seconds sound effect
-          if (prev <= 6 && prev > 1) {
+          const nextTime = prev - 1;
+
+          // 1. Every 1 min chime (except start, end, and last min)
+          // Range: 540(9m), 480(8m) ... 120(2m).
+          if (nextTime > 60 && nextTime < 600 && nextTime % 60 === 0) {
+            playBeep(440, 0.2); // "Pon"
+          }
+
+          // 2. Last 1 minute Warning (60s)
+          if (nextTime === 60) {
+            playTripleBeep(); // "Pi-pi-pi!"
+          }
+
+          // 3. Last 10 seconds (Existing & Refined)
+          // Original: if (prev <= 6 && prev > 1) -> plays at 5,4,3,2
+          if (nextTime <= 5 && nextTime > 0) {
             playBeep(880, 0.1);
           }
           // Long beep at finish
-          if (prev === 1) {
+          if (nextTime === 0) {
             playBeep(880, 0.6);
           }
-          return prev - 1;
+
+          return nextTime;
         });
       }, 1000);
     } else if (timerPhase === "WORK" && timeLeft === 0) {
@@ -205,12 +242,19 @@ export default function Home() {
     }
 
     return () => clearInterval(interval);
-  }, [timerPhase, timeLeft]);
+  }, [timerPhase, timeLeft, isPaused]);
 
   const handleStartTimer = () => {
     initAudio(); // Initialize audio context on user gesture
+    setIsPaused(false);
     setTimerPhase("PREP");
     setTimeLeft(3); // 3 seconds prep
+  };
+
+  const togglePause = () => {
+    if (timerPhase === "WORK") {
+      setIsPaused(prev => !prev);
+    }
   };
 
   const handleRegister = (name: string) => {
@@ -372,6 +416,8 @@ export default function Home() {
                 formatTime={formatTime}
                 handleStartTimer={handleStartTimer}
                 setTimerPhase={setTimerPhase}
+                isPaused={isPaused}
+                togglePause={togglePause}
                 menu={menu}
               />
             </motion.div>
@@ -415,6 +461,7 @@ export default function Home() {
               <RankingTab
                 userName={userName}
                 userScore={todayScore}
+                streak={streak}
               />
             </motion.div>
           )}

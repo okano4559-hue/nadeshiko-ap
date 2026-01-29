@@ -20,12 +20,14 @@ interface TrainingTabProps {
     handleStartTimer: () => void;
     setTimerPhase: (phase: "IDLE" | "PREP" | "WORK" | "FINISHED") => void;
 
+    isPaused: boolean;
+    togglePause: () => void;
     menu: TrainingItem[] | null;
 }
 
 export function TrainingTab({
     userName, isEditingName, tempName, setTempName, setIsEditingName, handleNameSave, handleNameEditStart, rank,
-    timerPhase, timeLeft, formatTime, handleStartTimer, setTimerPhase,
+    timerPhase, timeLeft, formatTime, handleStartTimer, setTimerPhase, isPaused, togglePause,
     menu
 }: TrainingTabProps) {
     return (
@@ -156,18 +158,54 @@ export function TrainingTab({
                                 key="work"
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
-                                className="text-center"
+                                className="text-center relative"
                             >
                                 <p className="text-sm font-bold text-slate-400 mb-2">残り時間</p>
-                                {timeLeft <= 5 ? (
-                                    <div className="text-[100px] leading-none font-black text-primary animate-pulse tabular-nums">
-                                        {timeLeft}
-                                    </div>
-                                ) : (
-                                    <div className="text-7xl font-black text-secondary font-mono tracking-tight tabular-nums">
-                                        {formatTime(timeLeft)}
-                                    </div>
-                                )}
+
+                                <div className="relative">
+                                    {timeLeft <= 5 ? (
+                                        <div className="text-[100px] leading-none font-black text-primary animate-pulse tabular-nums">
+                                            {timeLeft}
+                                        </div>
+                                    ) : (
+                                        <div className={`text-7xl font-black font-mono tracking-tight tabular-nums transition-opacity ${isPaused ? "text-slate-300" : "text-secondary"}`}>
+                                            {formatTime(timeLeft)}
+                                        </div>
+                                    )}
+
+                                    {/* Pause Status Overlay */}
+                                    {isPaused && (
+                                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                            <span className="bg-secondary text-white text-lg font-bold px-4 py-1 rounded-full shadow-lg animate-pulse">
+                                                TIMEOUT
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Pause Button */}
+                                <div className="mt-8 flex justify-center">
+                                    <button
+                                        onClick={togglePause}
+                                        className={`flex items-center gap-2 px-6 py-3 rounded-full font-bold shadow-md transition-all active:scale-95 ${isPaused
+                                            ? "bg-primary text-white hover:bg-primary/90"
+                                            : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                            }`}
+                                    >
+                                        {isPaused ? <Play fill="currentColor" size={20} /> : <div className="w-4 h-4 border-l-4 border-r-4 border-current h-4 w-4" />}
+                                        {/* Using CSS shapes or Lucide icons for Pause. Lucide 'Pause' is safer if imported, but I missed importing it in the Replace. 
+                                            Checking imports: 'Play' is there. 'X' is there. 
+                                            I should probably use standard Lucide Pause if available or just CSS. 
+                                            Let's check imports in original file. 
+                                            Line 3: Award, Calendar, CheckCircle, Clock, Pencil, Play, RotateCcw, X 
+                                            'Pause' is NOT imported. I should stick to 'Play' and maybe an icon for pause or just text/shape.
+                                            Actually I will add Pause to imports in a separate Edit if needed, but I can't do multiple edits easily in one go.
+                                            I'll use a CSS-based pause icon or just text for now to be safe, or assume I can modify imports too. 
+                                            Let's use a simple SVG inline or text.
+                                         */}
+                                        <span>{isPaused ? "再開する" : "一時停止"}</span>
+                                    </button>
+                                </div>
                             </motion.div>
                         )}
 
