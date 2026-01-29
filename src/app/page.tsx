@@ -75,7 +75,7 @@ export default function Home() {
     // FETCH SUPABASE DATA
     const fetchSupabaseData = async () => {
       const { data, error } = await supabase
-        .from('trainings')
+        .from('training_records')
         .select('*')
         .eq('user_id', currentUserId)
         .order('date', { ascending: true }); // We sort ascending for streak calc usually, but UI might reverse
@@ -153,7 +153,7 @@ export default function Home() {
       .channel('player_channel')
       .on(
         'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'trainings', filter: `user_id=eq.${currentUserId}` },
+        { event: 'UPDATE', schema: 'public', table: 'training_records', filter: `user_id=eq.${currentUserId}` },
         (payload) => {
           const newRecord = payload.new as Record;
           // Check if stamp changed
@@ -384,7 +384,7 @@ export default function Home() {
     };
 
     // Save to Supabase
-    supabase.from('trainings').insert([newRecord]).select().then(({ data }) => {
+    supabase.from('training_records').insert([newRecord]).select().then(({ data }) => {
       if (data && data[0]) {
         const saved = data[0] as Record;
         setRecords(prev => [...prev, saved]);

@@ -14,10 +14,10 @@ export default function CoachDashboard() {
 
         // Subscribe to realtime changes
         const channel = supabase
-            .channel('public:trainings')
+            .channel('public:training_records')
             .on(
                 'postgres_changes',
-                { event: '*', schema: 'public', table: 'trainings' },
+                { event: '*', schema: 'public', table: 'training_records' },
                 (payload) => {
                     console.log('Change received!', payload);
                     fetchRecords();
@@ -33,7 +33,7 @@ export default function CoachDashboard() {
     const fetchRecords = async () => {
         setLoading(true);
         const { data, error } = await supabase
-            .from("trainings")
+            .from("training_records")
             .select("*")
             .order("date", { ascending: false })
             .limit(20);
@@ -48,7 +48,7 @@ export default function CoachDashboard() {
 
     const handleStamp = async (recordId: string, stamp: StampType) => {
         const { error } = await supabase
-            .from("trainings")
+            .from("training_records")
             .update({ stamp_type: stamp })
             .eq("id", recordId);
 
@@ -148,8 +148,8 @@ function StampButton({ active, onClick, emoji, label }: { active: boolean, onCli
         <button
             onClick={onClick}
             className={`flex-1 flex flex-col items-center justify-center py-2 rounded-xl transition-all active:scale-95 ${active
-                    ? 'bg-emerald-500/20 text-emerald-400 ring-1 ring-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.3)]'
-                    : 'bg-slate-700/50 hover:bg-slate-700 text-slate-400'
+                ? 'bg-emerald-500/20 text-emerald-400 ring-1 ring-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.3)]'
+                : 'bg-slate-700/50 hover:bg-slate-700 text-slate-400'
                 }`}
         >
             <span className="text-xl mb-1 filter drop-shadow-md">{emoji}</span>
